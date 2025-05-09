@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+  --color-primary: #4CAF50;
+  --color-primary-light: #81C784;
+  --color-primary-dark: #388E3C;
+  --color-secondary: #2196F3;
+  --color-secondary-light: #64B5F6;
+  --color-secondary-dark: #1976D2;
+  --color-accent: #FFC107;
+  --color-accent-light: #FFD54F;
+  --color-accent-dark: #FFA000;
+  --color-background: #F9F9F9;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+}
+
+@layer base {
+  body {
+    @apply bg-base-100 text-base-content;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary hover:bg-[#388E3C] text-white transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary hover:bg-[#1976D2] text-white transition-colors;
+  }
+
+  .btn-accent {
+    @apply bg-accent hover:bg-[#FFA000] text-base-content transition-colors;
+  }
+
+  .card {
+    @apply bg-base-200 shadow-md rounded-lg;
+  }
+
+  .nav-link {
+    @apply hover:text-primary transition-colors;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-base-content mb-4;
+  }
+
+  .input-field {
+    @apply border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent outline-none;
+  }
+
+  .link {
+    @apply text-secondary hover:text-[#1976D2] transition-colors;
+  }
+}
