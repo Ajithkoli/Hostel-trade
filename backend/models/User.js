@@ -29,10 +29,28 @@ const userSchema = new mongoose.Schema({
   verified: {
     type: Boolean,
     default: false
-  }
+  },
+  hostel: {
+    type: String,
+    default: ""
+  },
+  profilePicture: {
+    type: String,
+    default: "uploads/default-avatar.png"
+  },
+  wishlist: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product'
+  }],
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }, {
   timestamps: true
 });
+
+// Create database indexes for optimized search performance
+userSchema.index({ hostel: 1 });
+
 
 // Password hashing middleware
 userSchema.pre('save', async function(next) {

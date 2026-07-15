@@ -1,26 +1,35 @@
-// src/store/adminSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Helper to get authorization headers from localStorage
+const getAuthHeaders = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  return userInfo?.token
+    ? { headers: { Authorization: `Bearer ${userInfo.token}` } }
+    : {};
+};
+
 // Fetch all users
 export const fetchUsers = createAsyncThunk("admin/fetchUsers", async () => {
-  const res = await axios.get("/api/users"); // Make sure your backend route is correct.
+  const res = await axios.get("/api/users", getAuthHeaders());
   return res.data;
 });
 
 // Approve a user
 export const approveUser = createAsyncThunk("admin/approveUser", async (id) => {
-  const res = await axios.patch(`/api/users/${id}/verify`);
+  const res = await axios.patch(`/api/users/${id}/verify`, {}, getAuthHeaders());
   return res.data;
 });
 
 // Reject a user (delete)
 export const rejectUser = createAsyncThunk("admin/rejectUser", async (id) => {
-  await axios.delete(`/api/users/${id}`);
+  await axios.delete(`/api/users/${id}`, getAuthHeaders());
   return id;
 });
+
+// Toggle admin role
 export const makeAdmin = createAsyncThunk("admin/makeAdmin", async (id) => {
-  const res = await axios.patch(`/api/users/${id}/make-admin`);
+  const res = await axios.patch(`/api/users/${id}/make-admin`, {}, getAuthHeaders());
   return res.data;
 });
 
@@ -29,10 +38,10 @@ export const editUser = createAsyncThunk(
   "admin/editUser",
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`/api/users/${id}`, data);
+      const res = await axios.put(`/api/users/${id}`, data, getAuthHeaders());
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message);
+      return rejectWithValue(error.response?.data?.message || "Failed to edit user");
     }
   }
 );
@@ -60,10 +69,11 @@ const adminSlice = createSlice({
       })
       .addCase(approveUser.fulfilled, (state, action) => {
         const index = state.users.findIndex(
-          (u) => u._id === action.payload._id
+          (u) => u._id === action.payload.user?._id || u._id === action.payload._id
         );
         if (index !== -1) {
-          state.users[index] = action.payload;
+          // Sync state with updated user payload (backend returns user nested or flat)
+          state.users[index] = action.payload.user || action.payload;
         }
       })
       .addCase(rejectUser.fulfilled, (state, action) => {
@@ -71,10 +81,10 @@ const adminSlice = createSlice({
       })
       .addCase(makeAdmin.fulfilled, (state, action) => {
         const index = state.users.findIndex(
-          (u) => u._id === action.payload._id
+          (u) => u._id === action.payload.user?._id || u._id === action.payload._id
         );
         if (index !== -1) {
-          state.users[index] = action.payload;
+          state.users[index] = action.payload.user || action.payload;
         }
       })
       .addCase(editUser.fulfilled, (state, action) => {

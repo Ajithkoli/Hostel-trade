@@ -5,10 +5,20 @@ import User from "../models/User.js";
 const protect = asyncHandler(async (req, res, next) => {
   let token;
 
-  if (req.cookies.jwt) {
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (token) {
     try {
-      const decoded = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-default-secret");
       req.user = await User.findById(decoded.userId).select("-password");
+      if (!req.user) {
+        res.status(401);
+        throw new Error("Not authorized, user not found");
+      }
       next();
     } catch (error) {
       res.status(401);

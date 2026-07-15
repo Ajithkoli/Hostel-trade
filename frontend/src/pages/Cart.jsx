@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getCartItems, clearCart, removeFromCart } from "../utils/cart";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../utils/image";
 
 export default function Cart() {
   const [items, setItems] = useState([]);
@@ -29,12 +30,12 @@ export default function Cart() {
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center mt-10 space-y-4">
             <img
-              src="/empty-cart.svg"
+              src="/empty-cart.png"
               alt="Empty cart"
               className="w-64 h-64 opacity-70"
             />
             <p className="text-lg text-gray-600">Your cart is currently empty.</p>
-            <Link to="/products" className="btn btn-primary">
+            <Link to="/marketplace" className="btn btn-primary">
               Go Shopping
             </Link>
           </div>
@@ -47,11 +48,7 @@ export default function Cart() {
               >
                 <figure className="w-full md:w-48 h-48">
                   <img
-                    src={
-                      item.images && item.images.length > 0
-                        ? `${import.meta.env.VITE_SERVER_URL}/${item.images[0]}`
-                        : "/placeholder.jpg"
-                    }
+                    src={getImageUrl(item.images?.[0])}
                     alt={item.name}
                     className="w-full h-full object-cover rounded-lg"
                   />

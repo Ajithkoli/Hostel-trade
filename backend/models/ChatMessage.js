@@ -1,5 +1,5 @@
 // models/ChatMessage.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const chatMessageSchema = new mongoose.Schema(
   {
@@ -21,8 +21,17 @@ const chatMessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    read: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ChatMessage", chatMessageSchema);
+// Index to optimize reading conversation histories
+chatMessageSchema.index({ conversationId: 1 });
+chatMessageSchema.index({ sender: 1, receiver: 1 });
+
+
+export default mongoose.model("ChatMessage", chatMessageSchema);

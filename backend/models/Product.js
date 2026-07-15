@@ -40,10 +40,25 @@ const productSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["Available", "Sold"],
+      default: "Available",
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Indexes to speed up marketplace filters, sorting, and details retrieval
+productSchema.index({ category: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ user: 1 });
+productSchema.index({ createdAt: -1 });
+
+// Full-text index for search queries
+productSchema.index({ name: "text", description: "text" });
+
 
 export default mongoose.model("Product", productSchema);

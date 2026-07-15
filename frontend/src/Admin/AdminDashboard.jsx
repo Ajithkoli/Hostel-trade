@@ -16,39 +16,41 @@ export default function AdminDashboard() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users
-              .filter((u) => !u.verified)
-              .map((user) => (
-                <tr key={user._id}>
-                  <td>{user.email}</td>
-                  <td>{user.verified ? "Verified" : "Pending"}</td>
-                  <td className="flex gap-2">
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => dispatch(approveUser(user._id))}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="btn btn-error btn-sm"
-                      onClick={() => dispatch(rejectUser(user._id))}
-                    >
-                      Reject
-                    </button>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users
+                .filter((u) => !u.verified)
+                .map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.email}</td>
+                    <td>{user.verified ? "Verified" : "Pending"}</td>
+                    <td className="flex gap-2">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => dispatch(approveUser(user._id))}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="btn btn-error btn-sm"
+                        onClick={() => dispatch(rejectUser(user._id))}
+                      >
+                        Reject
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

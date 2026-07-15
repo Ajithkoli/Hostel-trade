@@ -7,7 +7,7 @@ const categories = [
     description: "Gadgets & Tech",
     icon: "💻",
     color: "bg-gradient-to-r from-cyan-500 to-blue-500",
-    link: "/marketplace?category=electronics"
+    link: "/marketplace?category=Electronics"
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ const categories = [
     description: "Knowledge Hub",
     icon: "📚",
     color: "bg-gradient-to-r from-violet-500 to-purple-500",
-    link: "/marketplace?category=books"
+    link: "/marketplace?category=Books"
   },
   {
     id: 3,
@@ -23,7 +23,7 @@ const categories = [
     description: "Power & Equipment",
     icon: "⚡",
     color: "bg-gradient-to-r from-amber-500 to-orange-500",
-    link: "/marketplace?category=electrical"
+    link: "/marketplace?category=Electrical"
   },
   {
     id: 4,
@@ -31,7 +31,7 @@ const categories = [
     description: "Cars & Transport",
     icon: "🚗",
     color: "bg-gradient-to-r from-emerald-500 to-teal-500",
-    link: "/marketplace?category=vehicles"
+    link: "/marketplace?category=Vehicles"
   },
   {
     id: 5,
@@ -39,7 +39,7 @@ const categories = [
     description: "Everything Else",
     icon: "🎯",
     color: "bg-gradient-to-r from-pink-500 to-rose-500",
-    link: "/marketplace?category=miscellaneous"
+    link: "/marketplace?category=Miscellaneous"
   }
 ];
 

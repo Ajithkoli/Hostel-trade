@@ -1,10 +1,10 @@
-const asyncHandler = require("express-async-handler");
-const User = require("../models/User.model");
+import asyncHandler from "express-async-handler";
+import User from "../models/User.js";
 
 // @desc    Get all users
 // @route   GET /api/admin/users
 // @access  Admin
-const getAllUsers = asyncHandler(async (req, res) => {
+export const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find({ role: 'student' });
   res.json(users);
 });
@@ -12,7 +12,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 // @desc    Approve a user
 // @route   PATCH /api/admin/users/:id/verify
 // @access  Admin
-const approveUser = asyncHandler(async (req, res) => {
+export const approveUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   
   if (!user) {
@@ -44,7 +44,7 @@ const approveUser = asyncHandler(async (req, res) => {
 // @desc    Reject a user (delete)
 // @route   DELETE /api/admin/users/:id
 // @access  Admin
-const rejectUser = asyncHandler(async (req, res) => {
+export const rejectUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   
   if (!user) {
@@ -59,7 +59,7 @@ const rejectUser = asyncHandler(async (req, res) => {
 // @desc    Update user details
 // @route   PUT /api/admin/users/:id
 // @access  Admin
-const updateUser = asyncHandler(async (req, res) => {
+export const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   
   if (!user) {
@@ -88,7 +88,7 @@ const updateUser = asyncHandler(async (req, res) => {
 // @desc    Change user role
 // @route   PATCH /api/admin/users/:id/make-admin
 // @access  Admin
-const roleChange = asyncHandler(async (req, res) => {
+export const roleChange = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   
   if (!user) {
@@ -109,11 +109,3 @@ const roleChange = asyncHandler(async (req, res) => {
     }
   });
 });
-
-module.exports = {
-  getAllUsers,
-  approveUser,
-  rejectUser,
-  updateUser,
-  roleChange,
-};

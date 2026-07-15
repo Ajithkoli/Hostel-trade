@@ -27,7 +27,7 @@ export default function EditUserModal({ isOpen, onClose, user, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg w-96">
+      <div className="bg-white p-6 rounded shadow-lg w-full max-w-sm mx-4">
         <h2 className="text-xl font-bold mb-4">Edit User</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

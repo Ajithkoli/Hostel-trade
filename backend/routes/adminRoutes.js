@@ -1,23 +1,22 @@
-const express = require("express");
-const router = express.Router();
-const {
+import express from "express";
+import {
   getAllUsers,
   approveUser,
   rejectUser,
   updateUser,
   roleChange,
-} = require("../controllers/adminController");
+} from "../controllers/adminController.js";
+import { isAdmin, protect } from "../middleware/authMiddleware.js";
 
-const { isAdmin, protect } = require("../middleware/authMiddleware");
+const router = express.Router();
 
 router.use(protect); // user must be logged in
 router.use(isAdmin); // and must be admin
 
-router.get("/users", getAllUsers);
-router.patch("/users/:id/verify", approveUser);
-router.delete("/users/:id", rejectUser);
-router.put("/users/:id", updateUser);
-
+router.get("/", getAllUsers);
+router.patch("/:id/verify", approveUser);
+router.delete("/:id", rejectUser);
+router.put("/:id", updateUser);
 router.patch("/:id/make-admin", roleChange);
 
-module.exports = router;
+export default router;

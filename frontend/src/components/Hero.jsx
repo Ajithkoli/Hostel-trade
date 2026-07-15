@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Hero() {
+  const { user } = useSelector((state) => state.auth);
+
   return (
     <div className="bg-gradient-to-r from-primary-light to-primary py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,19 +14,21 @@ export default function Hero() {
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Your trusted platform for campus commerce. Buy, sell, and trade with your fellow students.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
             <Link
               to="/marketplace"
               className="btn btn-accent text-text-primary font-semibold px-8 py-3 rounded-lg hover:shadow-lg transition-all"
             >
               Browse Marketplace
             </Link>
-            <Link
-              to="/register"
-              className="btn bg-white text-primary font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-all"
-            >
-              Join Now
-            </Link>
+            {!user && (
+              <Link
+                to="/register"
+                className="btn bg-white text-primary font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-all"
+              >
+                Join Now
+              </Link>
+            )}
           </div>
         </div>
       </div>

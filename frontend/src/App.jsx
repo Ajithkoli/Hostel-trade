@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { checkAuth } from "./store/authSlice";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -23,9 +23,13 @@ import AddProduct from "./pages/AddProduct";
 import SingleProduct from "./pages/SingleProduct";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
+import WishlistPage from "./pages/WishlistPage";
 import MyProducts from "./pages/MyProducts";
-import ChatPage from "./pages/ChatPage";
-import ChatListPage from "./pages/hatListPage";
+import LostFoundPage from "./pages/LostFoundPage";
+import LostFoundDetailsPage from "./pages/LostFoundDetailsPage";
+import CreateLostFoundPost from "./pages/CreateLostFoundPost";
+
+import InboxPage from "./pages/InboxPage";
 import AdminProductManagement from "./Admin/AdminProductManagement";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -55,10 +59,16 @@ function App() {
         <Route path="/products/:id" element={<SingleProduct />} />
         <Route path="/addProduct" element={<PrivateRoute><AddProduct /></PrivateRoute>} />
         <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
-        <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/wishlist" element={<PrivateRoute><WishlistPage /></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><MyProducts /></PrivateRoute>} />
-        <Route path="/inbox" element={<PrivateRoute><ChatListPage /></PrivateRoute>} />
+
+        {/* Lost & Found Routes */}
+        <Route path="/lost-found" element={<LostFoundPage />} />
+        <Route path="/lost-found/:id" element={<LostFoundDetailsPage />} />
+        <Route path="/lost-found/create" element={<PrivateRoute><CreateLostFoundPost /></PrivateRoute>} />
+
+        <Route path="/inbox" element={<PrivateRoute><InboxPage /></PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/registration-pending" element={<RegistrationPending />} />
@@ -77,6 +87,7 @@ function App() {
             </AdminRoute>
           }
         >
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="products" element={<AdminProductManagement />} />

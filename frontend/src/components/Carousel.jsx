@@ -50,7 +50,7 @@ export default function Carousel() {
 
   return (
     <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="relative h-[400px] overflow-hidden rounded-xl">
+      <div className="relative h-[200px] sm:h-[300px] md:h-[400px] overflow-hidden rounded-xl">
         {/* Images */}
         {images.map((image, index) => (
           <div
@@ -65,9 +65,9 @@ export default function Carousel() {
               className="w-full h-full object-cover"
             />
             {/* Content Overlay */}
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-white">
-              <h2 className="text-4xl font-bold mb-4">{image.title}</h2>
-              <p className="text-xl">{image.description}</p>
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-white p-4 text-center">
+              <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mb-2 sm:mb-4">{image.title}</h2>
+              <p className="text-xs sm:text-sm md:text-xl max-w-md">{image.description}</p>
             </div>
           </div>
         ))}

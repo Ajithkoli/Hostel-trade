@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { addToCart } from "../utils/cart";
 import { useSelector } from "react-redux";
+import { getImageUrl } from "../utils/image";
 
 export default function SingleProduct() {
   const { id } = useParams();
@@ -49,7 +50,7 @@ export default function SingleProduct() {
 
   const imageUrls =
     product.images?.map(
-      (img) => `${import.meta.env.VITE_SERVER_URL}/${img}`
+      (img) => getImageUrl(img)
     ) || [];
 
   const isSeller = user && product.user && (user._id === product.user._id);
@@ -135,7 +136,7 @@ export default function SingleProduct() {
 
 ) : (
   <Link
-    to={`/chat?receiver=${product.user?._id}`}
+    to={`/inbox?receiver=${product.user?._id}`}
     className="btn btn-secondary"
   >
     Chat with Seller

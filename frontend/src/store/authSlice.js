@@ -3,7 +3,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Set default base URL and configurations for axios
-axios.defaults.baseURL = 'http://localhost:5000';
+const apiHostname = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'localhost'
+  : window.location.hostname;
+axios.defaults.baseURL = `http://${apiHostname}:5000`;
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 
@@ -66,8 +69,91 @@ export const checkAuth = createAsyncThunk(
   }
 );
 
+// Update profile details
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const response = await axios.put("/api/auth/profile", profileData);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const updatedUser = { ...userInfo, ...response.data };
+      localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update profile");
+    }
+  }
+);
+
+// Upload profile picture avatar
+export const updateAvatar = createAsyncThunk(
+  "auth/updateAvatar",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.put("/api/auth/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const updatedUser = { ...userInfo, ...response.data };
+      localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to upload avatar");
+    }
+  }
+);
+
+// Change Password
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (passwordData, { rejectWithValue }) => {
+    try {
+      const response = await axios.put("/api/auth/password", passwordData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to change password");
+    }
+  }
+);
+
+// Delete Account
+export const deleteAccount = createAsyncThunk(
+  "auth/deleteAccount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete("/api/auth/account");
+      localStorage.removeItem("userInfo");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete account");
+    }
+  }
+);
+
+// Toggle Wishlist item
+export const toggleWishlist = createAsyncThunk(
+  "auth/toggleWishlist",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/auth/wishlist/${productId}`);
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      const updatedUser = { ...userInfo, wishlist: response.data.wishlist };
+      localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+      return response.data.wishlist;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update wishlist");
+    }
+  }
+);
+
+
+
+const userInfoFromStorage = localStorage.getItem("userInfo")
+  ? JSON.parse(localStorage.getItem("userInfo"))
+  : null;
+
 const initialState = {
-  user: null,
+  user: userInfoFromStorage,
   loading: false,
   error: null,
   registrationSuccess: false,
@@ -115,6 +201,55 @@ const authSlice = createSlice({
       })
       // Logout cases
       .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+      })
+      // Update profile cases
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update avatar cases
+      .addCase(updateAvatar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateAvatar.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(updateAvatar.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Delete account cases
+      .addCase(deleteAccount.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+      })
+      // Toggle wishlist cases
+      .addCase(toggleWishlist.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.wishlist = action.payload;
+        }
+      })
+      // Check auth cases
+      .addCase(checkAuth.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.loading = false;
         state.user = null;
       });
   },

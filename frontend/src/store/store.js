@@ -6,12 +6,14 @@ import cartReducer from "./cartSlice";
 import productReducer from "./productSlice";
 import { cartPersistMiddleware } from "./cartSlice";
 import adminReducer from "./adminSlice";
+import lostFoundReducer from "./lostFoundSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
   cart: cartReducer,
   products: productReducer,
   admin: adminReducer,
+  lostFound: lostFoundReducer,
 });
 
 const store = configureStore({

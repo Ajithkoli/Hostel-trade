@@ -5,10 +5,16 @@ export default function AdminProductManagement() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Replace with your real fetch logic
-    fetch("/api/products")
+    // Fetch all products (including sold items)
+    fetch("/api/products?showAll=true")
       .then((res) => res.json())
-      .then((data) => setProducts(data))
+      .then((data) => {
+        if (data && data.products) {
+          setProducts(data.products);
+        } else {
+          setProducts(Array.isArray(data) ? data : []);
+        }
+      })
       .catch((err) => console.error("Error fetching products:", err));
   }, []);
 
