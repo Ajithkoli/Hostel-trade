@@ -13,7 +13,16 @@ export function getImageUrl(imagePath) {
   }
   
   // Make sure not to double-slash if VITE_SERVER_URL ends with a slash or imagePath starts with one
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
+  const envUrl = import.meta.env.VITE_SERVER_URL;
+  let serverUrl;
+  if (envUrl) {
+    serverUrl = envUrl;
+  } else {
+    const apiHostname = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'localhost'
+      : window.location.hostname;
+    serverUrl = `http://${apiHostname}:5000`;
+  }
   const cleanServerUrl = serverUrl.endsWith("/") ? serverUrl.slice(0, -1) : serverUrl;
   const cleanImagePath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   

@@ -25,10 +25,17 @@ export default function Chat({ conversationId, userId, otherUserId }) {
 
   // Connect Sockets & Listeners
   useEffect(() => {
-    const envUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
-    const socketUrl = (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1")
-      ? envUrl.replace("localhost", window.location.hostname).replace("127.0.0.1", window.location.hostname)
-      : envUrl;
+    const envUrl = import.meta.env.VITE_SERVER_URL;
+    let socketUrl;
+    if (envUrl) {
+      socketUrl = envUrl;
+    } else {
+      const apiHostname =
+        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+          ? "localhost"
+          : window.location.hostname;
+      socketUrl = `http://${apiHostname}:5000`;
+    }
 
     socketRef.current = io(socketUrl, {
       withCredentials: true,

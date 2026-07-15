@@ -2,7 +2,12 @@ import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/campuscart');
+    const conn = await mongoose.connect(
+      process.env.DB_URL ||
+      process.env.MONGODB_URI ||
+      process.env.MONGO_URI ||
+      'mongodb://localhost:27017/campuscart'
+    );
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {

@@ -3,10 +3,17 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Set default base URL and configurations for axios
-const apiHostname = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'localhost'
-  : window.location.hostname;
-axios.defaults.baseURL = `http://${apiHostname}:5000`;
+const envUrl = import.meta.env.VITE_SERVER_URL;
+let serverUrl;
+if (envUrl) {
+  serverUrl = envUrl;
+} else {
+  const apiHostname = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'localhost'
+    : window.location.hostname;
+  serverUrl = `http://${apiHostname}:5000`;
+}
+axios.defaults.baseURL = serverUrl;
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 

@@ -192,10 +192,24 @@ app.use('/api/lost-found', lostFoundRoutes);
 app.use('/api', chatRoutes);
 
 
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.json({ message: 'API is running...' });
-});
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+  app.use(express.static(frontendBuildPath));
+  
+  // Serve frontend index.html for any other route
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+} else {
+  // Basic route for testing in development
+  app.get('/', (req, res) => {
+    res.json({ message: 'API is running...' });
+  });
+}
 
 // Keep track of active users online (userId -> Set of socket.ids)
 const onlineUsers = new Map();
