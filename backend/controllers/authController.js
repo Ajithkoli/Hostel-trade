@@ -507,11 +507,17 @@ const googleLogin = asyncHandler(async (req, res) => {
       email,
       password: randomPassword,
       googleId,
-      verified: true, // Auto-verify OAuth accounts
+      verified: false, // Require admin approval first
       role: 'student',
       profilePicture: picture || 'uploads/default-avatar.png',
       hostel: 'Krishna'
     });
+  }
+
+  // Check verification for non-admin users
+  if (user.role !== "admin" && !user.verified) {
+    res.status(403);
+    throw new Error("Account is pending approval. Please wait for admin verification.");
   }
 
   // Generate JWT token
@@ -655,11 +661,17 @@ const githubLogin = asyncHandler(async (req, res) => {
       email,
       password: randomPassword,
       githubId,
-      verified: true, // Auto-verify OAuth accounts
+      verified: false, // Require admin approval first
       role: 'student',
       profilePicture: picture || 'uploads/default-avatar.png',
       hostel: 'Krishna'
     });
+  }
+
+  // Check verification for non-admin users
+  if (user.role !== "admin" && !user.verified) {
+    res.status(403);
+    throw new Error("Account is pending approval. Please wait for admin verification.");
   }
 
   // Generate JWT token
