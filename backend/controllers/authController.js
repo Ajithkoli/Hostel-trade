@@ -442,4 +442,252 @@ const getWishlist = asyncHandler(async (req, res) => {
   res.json(user.wishlist || []);
 });
 
-export { registerUser, loginUser, getProfile, logoutUser, forgotPassword, resetPassword, updateProfile, updateAvatar, changePassword, deleteAccount, toggleWishlist, getWishlist };
+// @desc    Google OAuth Login / Register
+// @route   POST /api/auth/google-login
+// @access  Public
+const googleLogin = asyncHandler(async (req, res) => {
+  const { credential, isDemo, profile } = req.body;
+  const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+
+  let email, name, picture, googleId;
+
+  if (isDemo) {
+    if (googleClientId) {
+      res.status(400);
+      throw new Error("Demo mode is disabled because real Google credentials are configured.");
+    }
+    if (!profile) {
+      res.status(400);
+      throw new Error("Demo profile data is required.");
+    }
+    email = profile.email;
+    name = profile.name;
+    picture = profile.picture;
+    googleId = profile.googleId;
+  } else {
+    if (!credential) {
+      res.status(400);
+      throw new Error("Google credential token is required.");
+    }
+
+    // Verify token with Google's API
+    const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+    if (!response.ok) {
+      res.status(401);
+      throw new Error("Invalid Google token");
+    }
+    const tokenInfo = await response.json();
+    if (tokenInfo.aud !== googleClientId && process.env.NODE_ENV === 'production') {
+      res.status(401);
+      throw new Error("Google token client ID mismatch");
+    }
+
+    email = tokenInfo.email;
+    name = tokenInfo.name;
+    picture = tokenInfo.picture;
+    googleId = tokenInfo.sub;
+  }
+
+  if (!email) {
+    res.status(400);
+    throw new Error("Google account email is missing");
+  }
+
+  let user = await User.findOne({ $or: [{ email }, { googleId }] });
+
+  if (user) {
+    if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+  } else {
+    const randomPassword = crypto.randomBytes(20).toString('hex');
+    user = await User.create({
+      name,
+      email,
+      password: randomPassword,
+      googleId,
+      verified: true, // Auto-verify OAuth accounts
+      role: 'student',
+      profilePicture: picture || 'uploads/default-avatar.png',
+      hostel: 'Krishna'
+    });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET || "your-default-secret",
+    { expiresIn: "30d" }
+  );
+
+  // Set JWT token in cookie
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+  });
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    hostel: user.hostel,
+    role: user.role,
+    verified: user.verified,
+    profilePicture: user.profilePicture,
+    wishlist: user.wishlist || [],
+    token
+  });
+});
+
+// @desc    GitHub OAuth Login / Register
+// @route   POST /api/auth/github-login
+// @access  Public
+const githubLogin = asyncHandler(async (req, res) => {
+  const { code, isDemo, profile } = req.body;
+  const githubClientId = process.env.GITHUB_CLIENT_ID || process.env.VITE_GITHUB_CLIENT_ID;
+
+  let email, name, picture, githubId;
+
+  if (isDemo) {
+    if (githubClientId) {
+      res.status(400);
+      throw new Error("Demo mode is disabled because real GitHub credentials are configured.");
+    }
+    if (!profile) {
+      res.status(400);
+      throw new Error("Demo profile data is required.");
+    }
+    email = profile.email;
+    name = profile.name;
+    picture = profile.picture;
+    githubId = profile.githubId;
+  } else {
+    if (!code) {
+      res.status(400);
+      throw new Error("GitHub authorization code is required.");
+    }
+
+    // Exchange code for token
+    const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        client_id: githubClientId,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        code
+      })
+    });
+
+    if (!tokenResponse.ok) {
+      res.status(400);
+      throw new Error("Failed to authenticate with GitHub");
+    }
+
+    const tokenData = await tokenResponse.json();
+    if (tokenData.error) {
+      res.status(400);
+      throw new Error(tokenData.error_description || "GitHub authentication error");
+    }
+
+    const accessToken = tokenData.access_token;
+
+    // Fetch user profile
+    const userResponse = await fetch("https://api.github.com/user", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+        "User-Agent": "CampusCart"
+      }
+    });
+
+    if (!userResponse.ok) {
+      res.status(400);
+      throw new Error("Failed to fetch user data from GitHub");
+    }
+
+    const githubUser = await userResponse.json();
+    githubId = String(githubUser.id);
+    name = githubUser.name || githubUser.login;
+    picture = githubUser.avatar_url;
+    email = githubUser.email;
+
+    // If email is null/private, fetch emails from user/emails endpoint
+    if (!email) {
+      const emailResponse = await fetch("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
+          "User-Agent": "CampusCart"
+        }
+      });
+      if (emailResponse.ok) {
+        const emails = await emailResponse.json();
+        const primaryEmail = emails.find(e => e.primary && e.verified);
+        if (primaryEmail) {
+          email = primaryEmail.email;
+        }
+      }
+    }
+  }
+
+  if (!email) {
+    res.status(400);
+    throw new Error("GitHub account email is missing or unverified");
+  }
+
+  let user = await User.findOne({ $or: [{ email }, { githubId }] });
+
+  if (user) {
+    if (!user.githubId) {
+      user.githubId = githubId;
+      await user.save();
+    }
+  } else {
+    const randomPassword = crypto.randomBytes(20).toString('hex');
+    user = await User.create({
+      name,
+      email,
+      password: randomPassword,
+      githubId,
+      verified: true, // Auto-verify OAuth accounts
+      role: 'student',
+      profilePicture: picture || 'uploads/default-avatar.png',
+      hostel: 'Krishna'
+    });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET || "your-default-secret",
+    { expiresIn: "30d" }
+  );
+
+  // Set JWT token in cookie
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+  });
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    hostel: user.hostel,
+    role: user.role,
+    verified: user.verified,
+    profilePicture: user.profilePicture,
+    wishlist: user.wishlist || [],
+    token
+  });
+});
+
+export { registerUser, loginUser, getProfile, logoutUser, forgotPassword, resetPassword, updateProfile, updateAvatar, changePassword, deleteAccount, toggleWishlist, getWishlist, googleLogin, githubLogin };

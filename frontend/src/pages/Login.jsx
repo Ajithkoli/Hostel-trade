@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../store/authSlice";
 import { FaEnvelope, FaLock, FaExclamationCircle } from "react-icons/fa";
 import AuthLayout from "./AuthLayout";
+import OAuthButtons from "../components/OAuthButtons";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -102,6 +103,8 @@ export default function Login() {
         >
           {loading ? "Authenticating..." : "Sign In"}
         </button>
+
+        <OAuthButtons />
 
         <p className="text-center text-[#212121]/70">
           Don't have an account?{' '}

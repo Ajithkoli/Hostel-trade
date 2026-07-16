@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import { registerUser, loginUser, getProfile, logoutUser, forgotPassword, resetPassword, updateProfile, updateAvatar, changePassword, deleteAccount, toggleWishlist, getWishlist } from '../controllers/authController.js';
+import { registerUser, loginUser, getProfile, logoutUser, forgotPassword, resetPassword, updateProfile, updateAvatar, changePassword, deleteAccount, toggleWishlist, getWishlist, googleLogin, githubLogin } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/upload.js';
 import {
@@ -41,6 +41,16 @@ router.put('/resetpassword/:resettoken', resetPasswordValidator, resetPassword);
 // @desc    Logout user
 // @access  Private
 router.post('/logout', protect, logoutUser);
+
+// @route   POST /api/auth/google-login
+// @desc    Google OAuth Login / Register
+// @access  Public
+router.post('/google-login', googleLogin);
+
+// @route   POST /api/auth/github-login
+// @desc    GitHub OAuth Login / Register
+// @access  Public
+router.post('/github-login', githubLogin);
 
 // @route   GET /api/auth/me
 // @desc    Get current user profile (for checkAuth)

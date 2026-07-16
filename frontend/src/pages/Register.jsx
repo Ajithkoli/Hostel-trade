@@ -10,6 +10,7 @@ import {
   FaExclamationCircle,
 } from "react-icons/fa";
 import AuthLayout from "./AuthLayout";
+import OAuthButtons from "../components/OAuthButtons";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -145,6 +146,8 @@ export default function Register() {
         >
           {loading ? "Registering..." : "Register"}
         </button>
+
+        <OAuthButtons />
 
         <p className="text-center text-gray-600">
           Already have an account?{" "}

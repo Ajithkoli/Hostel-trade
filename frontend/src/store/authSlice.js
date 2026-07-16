@@ -78,6 +78,38 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// Google OAuth Login
+export const googleOAuthLogin = createAsyncThunk(
+  "auth/googleLogin",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/api/auth/google-login", payload);
+      localStorage.setItem('userInfo', JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Google login failed"
+      );
+    }
+  }
+);
+
+// GitHub OAuth Login
+export const githubOAuthLogin = createAsyncThunk(
+  "auth/githubLogin",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/api/auth/github-login", payload);
+      localStorage.setItem('userInfo', JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "GitHub login failed"
+      );
+    }
+  }
+);
+
 // Logout user
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
   await axios.post("/api/auth/logout");
@@ -229,6 +261,34 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Google OAuth login cases
+      .addCase(googleOAuthLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleOAuthLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(googleOAuthLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // GitHub OAuth login cases
+      .addCase(githubOAuthLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(githubOAuthLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(githubOAuthLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

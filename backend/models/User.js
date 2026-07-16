@@ -43,7 +43,17 @@ const userSchema = new mongoose.Schema({
     ref: 'Product'
   }],
   resetPasswordToken: String,
-  resetPasswordExpire: Date
+  resetPasswordExpire: Date,
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  githubId: {
+    type: String,
+    unique: true,
+    sparse: true
+  }
 }, {
   timestamps: true
 });
