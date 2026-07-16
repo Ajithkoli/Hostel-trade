@@ -19,8 +19,19 @@ const protect = asyncHandler(async (req, res, next) => {
         res.status(401);
         throw new Error("Not authorized, user not found");
       }
+
+      // Enforce admin verification status check for all protected endpoints
+      if (req.user.role !== "admin" && !req.user.verified) {
+        res.status(403);
+        throw new Error("Account is pending approval. Please wait for admin verification.");
+      }
+
       next();
     } catch (error) {
+      if (res.statusCode === 403) {
+        res.status(403);
+        throw error;
+      }
       res.status(401);
       throw new Error("Not authorized, invalid token");
     }
