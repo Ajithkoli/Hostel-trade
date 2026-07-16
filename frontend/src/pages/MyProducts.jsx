@@ -1,6 +1,6 @@
 // pages/Dashboard.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,9 +13,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchMyProducts = async () => {
       try {
-        const { data } = await axios.get("/api/products/myproducts", {
-          withCredentials: true,
-        });
+        const { data } = await api.get("/api/products/myproducts");
         setProducts(data);
       } catch (err) {
         const errMsg = err.response?.data?.message || "Failed to load your products";

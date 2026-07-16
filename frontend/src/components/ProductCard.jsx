@@ -6,7 +6,7 @@ import { addToCart } from "../utils/cart";
 import { getImageUrl } from "../utils/image";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../utils/api";
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
@@ -42,7 +42,7 @@ export default function ProductCard({ product }) {
     e.stopPropagation();
     const nextStatus = productStatus === "Available" ? "Sold" : "Available";
     try {
-      await axios.patch(`/api/products/${product._id}/status`, { status: nextStatus }, { withCredentials: true });
+      await api.patch(`/api/products/${product._id}/status`, { status: nextStatus });
       setProductStatus(nextStatus);
       toast.success(`Product marked as ${nextStatus}`);
     } catch (err) {
@@ -54,7 +54,7 @@ export default function ProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await axios.post(`/api/products/${product._id}/renew`, {}, { withCredentials: true });
+      await api.post(`/api/products/${product._id}/renew`, {});
       toast.success("Listing renewed (bumped to top)!");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to renew listing");

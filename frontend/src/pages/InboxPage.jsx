@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import { FaCheck, FaCheckDouble } from "react-icons/fa";
 import { HiOutlinePaperAirplane, HiOutlineSearch, HiOutlineArrowLeft } from "react-icons/hi";
@@ -57,9 +57,7 @@ export default function InboxPage() {
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const { data } = await axios.get(`/api/conversations/${user._id}`, {
-          withCredentials: true,
-        });
+        const { data } = await api.get(`/api/conversations/${user._id}`);
         setConversations(data);
       } catch (err) {
         toast.error("Failed to load conversations");
@@ -160,15 +158,13 @@ export default function InboxPage() {
       setMobilePanelView("chat");
 
       try {
-        const { data } = await axios.get(
-          `/api/chat/conversation/${conversationId}`,
-          { withCredentials: true }
+        const { data } = await api.get(
+          `/api/chat/conversation/${conversationId}`
         );
         setMessages(data);
-        await axios.patch(
+        await api.patch(
           `/api/chat/conversation/${conversationId}/read`,
-          {},
-          { withCredentials: true }
+          {}
         );
         if (socketRef.current) {
           socketRef.current.emit("markAsRead", { conversationId, userId: user._id });

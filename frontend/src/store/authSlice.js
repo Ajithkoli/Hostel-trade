@@ -17,6 +17,32 @@ axios.defaults.baseURL = serverUrl;
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 
+// Interceptor to automatically attach JWT token from localStorage to all global axios requests
+axios.interceptors.request.use(
+  (config) => {
+    const userInfoStr = localStorage.getItem("userInfo");
+    if (userInfoStr) {
+      try {
+        const userInfo = JSON.parse(userInfoStr);
+        if (userInfo && userInfo.token) {
+          if (config.headers && typeof config.headers.set === 'function') {
+            config.headers.set('Authorization', `Bearer ${userInfo.token}`);
+          } else {
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${userInfo.token}`;
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing userInfo from localStorage:", error);
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Register user
 export const registerUser = createAsyncThunk(
   "auth/register",

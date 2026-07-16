@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../store/authSlice";
 import { HiOutlineShoppingCart, HiMenu, HiX, HiOutlineBell } from "react-icons/hi";
 import { getImageUrl } from "../utils/image";
-import axios from "axios";
+import api from "../utils/api";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);   // hamburger / mobile drawer
@@ -43,7 +43,7 @@ export default function Navbar() {
 
   const fetchNotifications = async () => {
     try {
-      const { data } = await axios.get("/api/notifications");
+      const { data } = await api.get("/api/notifications");
       setNotifications(data);
     } catch (err) {
       console.error("Failed to load notifications:", err.message);
@@ -59,7 +59,7 @@ export default function Navbar() {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await axios.patch("/api/notifications/read-all");
+      await api.patch("/api/notifications/read-all");
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     } catch (err) {
       console.error("Failed to mark all as read:", err.message);

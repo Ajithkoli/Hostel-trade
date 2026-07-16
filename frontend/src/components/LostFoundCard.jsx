@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getImageUrl } from "../utils/image";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../utils/api";
 import { updateLostFoundPost } from "../store/lostFoundSlice";
 
 export default function LostFoundCard({ post, onDeleted }) {
@@ -20,13 +20,8 @@ export default function LostFoundCard({ post, onDeleted }) {
     e.stopPropagation();
     const nextStatus = postStatus === "Open" ? "Claimed" : "Open";
     
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    const config = userInfo?.token
-      ? { headers: { Authorization: `Bearer ${userInfo.token}` } }
-      : {};
-
     try {
-      const { data } = await axios.put(`/api/lost-found/${post._id}`, { status: nextStatus }, config);
+      const { data } = await api.put(`/api/lost-found/${post._id}`, { status: nextStatus });
       setPostStatus(nextStatus);
       toast.success(`Post marked as ${nextStatus}`);
       if (onDeleted) onDeleted(); // trigger refetch or refresh parent state if needed
@@ -39,13 +34,8 @@ export default function LostFoundCard({ post, onDeleted }) {
     e.preventDefault();
     e.stopPropagation();
     
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    const config = userInfo?.token
-      ? { headers: { Authorization: `Bearer ${userInfo.token}` } }
-      : {};
-
     try {
-      await axios.put(`/api/lost-found/${post._id}`, { status: "Closed" }, config);
+      await api.put(`/api/lost-found/${post._id}`, { status: "Closed" });
       setPostStatus("Closed");
       toast.success("Post marked as Closed");
       if (onDeleted) onDeleted();

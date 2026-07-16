@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 
 // Define categories before using them in state
@@ -50,8 +50,7 @@ export default function AddProduct() {
       });
 
       // Adjust the endpoint if necessary (here we use /api/products to match our redux slice)
-      await axios.post("/api/products", data, {
-        withCredentials: true,
+      await api.post("/api/products", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import { FaCheck, FaCheckDouble } from "react-icons/fa";
 
@@ -97,13 +97,11 @@ export default function Chat({ conversationId, userId, otherUserId }) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const { data } = await axios.get(`/api/chat/conversation/${conversationId}`, {
-          withCredentials: true,
-        });
+        const { data } = await api.get(`/api/chat/conversation/${conversationId}`);
         setMessages(data);
         
         // Sync unread status on loading conversation
-        await axios.patch(`/api/chat/conversation/${conversationId}/read`, {}, { withCredentials: true });
+        await api.patch(`/api/chat/conversation/${conversationId}/read`, {});
         
         // Notify socket
         if (socketRef.current) {
