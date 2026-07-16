@@ -70,12 +70,12 @@ export default function Navbar() {
 
   return (
     <nav className="bg-surface shadow-md relative z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           
           {/* Logo & Left Links */}
           <div className="flex">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center gap-2">
               <img src="/images/logo.png" alt="CampusCart Logo" className="h-14 w-14" />
               <span className="text-primary text-xl font-bold">CampusCart</span>
             </Link>
